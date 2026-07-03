@@ -1,0 +1,98 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>TicketEase | Reserva de Eventos Exclusivos</title>
+  <meta name="description" content="Descubre y reserva entradas para los eventos más exclusivos de música, tecnología y gastronomía. Simple, rápido y seguro.">
+  <link rel="stylesheet" href="css/styles.css">
+</head>
+<body>
+
+  <!-- Header / Navigation -->
+  <header class="glass">
+    <div class="nav-container">
+      <a href="/" class="logo">
+        <i data-lucide="ticket"></i>
+        <span>TicketEase</span>
+      </a>
+      <nav class="nav-links">
+        <a href="/" class="nav-link active">Inicio</a>
+        <a href="/dashboard" class="nav-link">Dashboard</a>
+      </nav>
+    </div>
+  </header>
+
+  <!-- Hero Section -->
+  <section class="hero">
+    <h1>Experiencias Únicas,<br>Reserva Sin Esfuerzo</h1>
+    <p>Explora nuestra curaduría de eventos exclusivos y asegura tu lugar en segundos con nuestra plataforma ultra rápida.</p>
+  </section>
+
+  <!-- Main Content -->
+  <main>
+    <h2 class="section-title">
+      <i data-lucide="calendar-days"></i>
+      <span>Próximos Eventos</span>
+    </h2>
+
+    <!-- Events Grid Container -->
+    <div class="events-grid" id="events-container">
+      <!-- Dynamically filled by app.js -->
+      <div style="grid-column: 1/-1; text-align: center; color: var(--text-muted); padding: 3rem;">
+        Cargando eventos...
+      </div>
+    </div>
+  </main>
+
+  <!-- Booking Dialog Modal -->
+  <dialog id="booking-dialog" class="glass">
+    <div class="dialog-header">
+      <h2>Reservar Entradas</h2>
+      <button class="close-dialog" id="close-dialog-btn" aria-label="Cerrar modal">
+        <i data-lucide="x"></i>
+      </button>
+    </div>
+    <form id="booking-form">
+      <input type="hidden" id="booking-event-id" name="eventId">
+      
+      <div class="form-group" style="margin-bottom: 1.5rem; padding: 1rem; border-radius: var(--radius-sm); background: rgba(255, 255, 255, 0.02); border: 1px dashed var(--border-color);">
+        <p id="booking-event-title" style="font-weight: 600; font-size: 1.1rem; margin-bottom: 0.25rem;"></p>
+        <p id="booking-event-info" style="font-size: 0.85rem; color: var(--text-secondary); display: flex; align-items: center; gap: 0.5rem;"></p>
+      </div>
+
+      <div class="form-group">
+        <label for="userName">Nombre Completo</label>
+        <input type="text" id="userName" name="userName" class="form-control" placeholder="Ej. Juan Pérez" required>
+      </div>
+
+      <div class="form-group">
+        <label for="userEmail">Correo Electrónico</label>
+        <input type="email" id="userEmail" name="userEmail" class="form-control" placeholder="correo@ejemplo.com" required>
+      </div>
+
+      <div class="form-group">
+        <label for="ticketsCount">Cantidad de Entradas</label>
+        <input type="number" id="ticketsCount" name="ticketsCount" class="form-control" min="1" max="10" value="1" required>
+        <span style="font-size: 0.75rem; color: var(--text-muted); margin-top: 0.25rem; display: block;">Máximo 10 entradas por persona.</span>
+      </div>
+
+      <button type="submit" class="btn btn-primary" style="margin-top: 1rem;">
+        <i data-lucide="sparkles"></i>
+        Confirmar Reserva
+      </button>
+    </form>
+  </dialog>
+
+  <!-- Container for Toast Notifications -->
+  <div class="toast-container" id="toast-container"></div>
+
+  <!-- Lucide Icons Library -->
+  <script src="https://unpkg.com/lucide@latest"></script>
+  <script>
+    // Initialize Lucide icons on page load
+    lucide.createIcons();
+  </script>
+  <script src="js/app.js"></script>
+</body>
+</html>

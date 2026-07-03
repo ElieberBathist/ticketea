@@ -1,0 +1,188 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>TicketEase | Dashboard de Administración</title>
+  <meta name="description" content="Gestiona tus eventos, revisa reservas y controla la capacidad en tiempo real.">
+  <link rel="stylesheet" href="css/styles.css">
+</head>
+<body>
+
+  <!-- Header / Navigation -->
+  <header class="glass">
+    <div class="nav-container">
+      <a href="/" class="logo">
+        <i data-lucide="ticket"></i>
+        <span>TicketEase</span>
+      </a>
+      <nav class="nav-links">
+        <a href="/" class="nav-link">Inicio</a>
+        <a href="/dashboard" class="nav-link active">Dashboard</a>
+      </nav>
+    </div>
+  </header>
+
+  <!-- Hero Section (Mini) -->
+  <section class="hero" style="margin-top: 2rem; margin-bottom: 2rem; text-align: left;">
+    <h1 style="font-size: 2.2rem; margin-bottom: 0.5rem;">Panel de Administración</h1>
+    <p style="margin: 0; font-size: 1rem;">Supervisa la venta de entradas y crea nuevos eventos de manera instantánea.</p>
+  </section>
+
+  <!-- Main Content -->
+  <main>
+    <!-- Stats Cards Grid -->
+    <div class="dashboard-grid">
+      <div class="stat-card glass">
+        <div class="stat-icon">
+          <i data-lucide="calendar"></i>
+        </div>
+        <div class="stat-info">
+          <h4>Eventos</h4>
+          <p id="stat-events">-</p>
+        </div>
+      </div>
+      <div class="stat-card glass">
+        <div class="stat-icon">
+          <i data-lucide="ticket"></i>
+        </div>
+        <div class="stat-info">
+          <h4>Reservas</h4>
+          <p id="stat-bookings">-</p>
+        </div>
+      </div>
+      <div class="stat-card glass">
+        <div class="stat-icon">
+          <i data-lucide="shopping-bag"></i>
+        </div>
+        <div class="stat-info">
+          <h4>Entradas Vendidas</h4>
+          <p id="stat-sold">-</p>
+        </div>
+      </div>
+      <div class="stat-card glass">
+        <div class="stat-icon">
+          <i data-lucide="trending-up"></i>
+        </div>
+        <div class="stat-info">
+          <h4>Ocupación Media</h4>
+          <p id="stat-occupancy">-%</p>
+        </div>
+      </div>
+    </div>
+
+    <!-- Dashboard Content Area -->
+    <div class="dashboard-content">
+      <!-- Create Event Panel -->
+      <section class="dashboard-panel glass">
+        <h2>
+          <i data-lucide="plus-circle" style="color: var(--accent-primary);"></i>
+          <span>Crear Evento</span>
+        </h2>
+        <form id="create-event-form">
+          <div class="form-group">
+            <label for="eventTitle">Título del Evento</label>
+            <input type="text" id="eventTitle" name="title" class="form-control" placeholder="Ej. Concierto Acústico de Otoño" required>
+          </div>
+          
+          <div class="form-group">
+            <label for="eventDescription">Descripción</label>
+            <textarea id="eventDescription" name="description" class="form-control" placeholder="Describe brevemente de qué trata el evento..." required></textarea>
+          </div>
+
+          <div class="form-group">
+            <label for="eventDate">Fecha y Hora</label>
+            <input type="datetime-local" id="eventDate" name="date" class="form-control" required>
+          </div>
+
+          <div class="form-group">
+            <label for="eventLocation">Ubicación</label>
+            <input type="text" id="eventLocation" name="location" class="form-control" placeholder="Ej. Teatro Gran Splendid" required>
+          </div>
+
+          <div class="form-group" style="display: grid; grid-template-columns: 1fr; gap: 1rem;">
+            <div>
+              <label for="eventCapacity">Capacidad (Asientos)</label>
+              <input type="number" id="eventCapacity" name="capacity" class="form-control" min="1" value="50" required>
+            </div>
+          </div>
+
+          <div class="form-group">
+            <label for="eventImageUrl">URL de la Imagen (Opcional)</label>
+            <input type="url" id="eventImageUrl" name="imageUrl" class="form-control" placeholder="https://images.unsplash.com/...">
+          </div>
+
+          <button type="submit" class="btn btn-primary" style="margin-top: 1rem;">
+            <i data-lucide="check"></i>
+            Guardar Evento
+          </button>
+        </form>
+      </section>
+
+      <!-- Manage & Reservations Panel -->
+      <div style="display: flex; flex-direction: column; gap: 2rem;">
+        <!-- Bookings List Panel -->
+        <section class="dashboard-panel glass" style="flex-grow: 1;">
+          <h2>
+            <i data-lucide="users" style="color: var(--accent-success);"></i>
+            <span>Reservas Recientes</span>
+          </h2>
+          <div class="table-container">
+            <table>
+              <thead>
+                <tr>
+                  <th>Cliente</th>
+                  <th>Evento</th>
+                  <th>Cant.</th>
+                  <th>Fecha</th>
+                </tr>
+              </thead>
+              <tbody id="bookings-table-body">
+                <!-- Dynamically filled by dashboard.js -->
+                <tr>
+                  <td colspan="4" style="text-align: center; color: var(--text-muted); padding: 2rem;">Cargando reservas...</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </section>
+
+        <!-- Events List Panel -->
+        <section class="dashboard-panel glass">
+          <h2>
+            <i data-lucide="list" style="color: var(--accent-secondary);"></i>
+            <span>Eventos Activos</span>
+          </h2>
+          <div class="table-container">
+            <table>
+              <thead>
+                <tr>
+                  <th>Evento</th>
+                  <th>Capacidad / Disp.</th>
+                  <th>Fecha</th>
+                </tr>
+              </thead>
+              <tbody id="events-table-body">
+                <!-- Dynamically filled by dashboard.js -->
+                <tr>
+                  <td colspan="3" style="text-align: center; color: var(--text-muted); padding: 2rem;">Cargando eventos...</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </section>
+      </div>
+    </div>
+  </main>
+
+  <!-- Container for Toast Notifications -->
+  <div class="toast-container" id="toast-container"></div>
+
+  <!-- Lucide Icons Library -->
+  <script src="https://unpkg.com/lucide@latest"></script>
+  <script>
+    lucide.createIcons();
+  </script>
+  <script src="js/dashboard.js"></script>
+</body>
+</html>
