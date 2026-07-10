@@ -3,6 +3,8 @@ import { Sequelize, DataTypes } from 'sequelize';
 import cors from 'cors';
 import path from 'path';
 import { fileURLToPath } from 'url';
+import bcrypt from 'bcryptjs';
+import session from 'express-session';
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
@@ -12,6 +14,28 @@ const PORT = process.env.PORT || 3000;
 
 app.use(cors());
 app.use(express.json());
+
+// Session configuration
+app.use(session({
+  secret: 'ticketease-secret-key-13298',
+  resave: false,
+  saveUninitialized: false,
+  cookie: {
+    secure: false,
+    maxAge: 24 * 60 * 60 * 1000
+  }
+}));
+
+// Route protection for direct HTML file access
+app.use((req, res, next) => {
+  if (req.path === '/dashboard.html') {
+    if (!req.session || !req.session.userId) {
+      return res.redirect('/login.html');
+    }
+  }
+  next();
+});
+
 app.use(express.static(path.join(__dirname, 'public')));
 
 // Database Connection
@@ -84,6 +108,29 @@ const Booking = sequelize.define('Booking', {
   },
 });
 
+const User = sequelize.define('User', {
+  id: {
+    type: DataTypes.UUID,
+    defaultValue: DataTypes.UUIDV4,
+    primaryKey: true,
+  },
+  name: {
+    type: DataTypes.STRING,
+    allowNull: false,
+    validate: { notEmpty: true },
+  },
+  email: {
+    type: DataTypes.STRING,
+    allowNull: false,
+    unique: true,
+    validate: { isEmail: true },
+  },
+  password: {
+    type: DataTypes.STRING,
+    allowNull: false,
+  },
+});
+
 // Relationships
 Event.hasMany(Booking, { foreignKey: 'eventId', onDelete: 'CASCADE' });
 Booking.belongsTo(Event, { foreignKey: 'eventId' });
@@ -137,6 +184,125 @@ async function seedDatabase() {
   }
 }
 
+// Authentication Middlewares
+function requireAuth(req, res, next) {
+  if (!req.session || !req.session.userId) {
+    return res.status(401).json({ error: 'No autorizado. Por favor inicie sesión.' });
+  }
+  next();
+}
+
+function requireAuthRedirect(req, res, next) {
+  if (!req.session || !req.session.userId) {
+    return res.redirect('/login.html');
+  }
+  next();
+}
+
+// Auth API Routes
+app.post('/api/auth/register', async (req, res) => {
+  try {
+    const { name, email, password } = req.body;
+    
+    if (!name || !email || !password) {
+      return res.status(400).json({ error: 'Todos los campos son obligatorios.' });
+    }
+
+    if (password.length < 6) {
+      return res.status(400).json({ error: 'La contraseña debe tener al menos 6 caracteres.' });
+    }
+
+    // Check if user already exists
+    const existingUser = await User.findOne({ where: { email: email.toLowerCase() } });
+    if (existingUser) {
+      return res.status(400).json({ error: 'El correo electrónico ya está registrado.' });
+    }
+
+    // Hash password
+    const hashedPassword = bcrypt.hashSync(password, 10);
+
+    // Create user
+    const newUser = await User.create({
+      name,
+      email: email.toLowerCase(),
+      password: hashedPassword
+    });
+
+    // Auto login
+    req.session.userId = newUser.id;
+    req.session.userName = newUser.name;
+
+    res.status(201).json({
+      success: true,
+      user: {
+        id: newUser.id,
+        name: newUser.name,
+        email: newUser.email
+      }
+    });
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
+});
+
+app.post('/api/auth/login', async (req, res) => {
+  try {
+    const { email, password } = req.body;
+
+    if (!email || !password) {
+      return res.status(400).json({ error: 'Todos los campos son obligatorios.' });
+    }
+
+    const user = await User.findOne({ where: { email: email.toLowerCase() } });
+    if (!user || !bcrypt.compareSync(password, user.password)) {
+      return res.status(401).json({ error: 'Correo electrónico o contraseña incorrectos.' });
+    }
+
+    // Set session
+    req.session.userId = user.id;
+    req.session.userName = user.name;
+
+    res.json({
+      success: true,
+      user: {
+        id: user.id,
+        name: user.name,
+        email: user.email
+      }
+    });
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
+});
+
+app.post('/api/auth/logout', (req, res) => {
+  if (req.session) {
+    req.session.destroy(err => {
+      if (err) {
+        return res.status(500).json({ error: 'No se pudo cerrar la sesión.' });
+      }
+      res.clearCookie('connect.sid');
+      return res.json({ success: true });
+    });
+  } else {
+    res.json({ success: true });
+  }
+});
+
+app.get('/api/auth/me', (req, res) => {
+  if (req.session && req.session.userId) {
+    res.json({
+      loggedIn: true,
+      user: {
+        id: req.session.userId,
+        name: req.session.userName
+      }
+    });
+  } else {
+    res.json({ loggedIn: false });
+  }
+});
+
 // API Routes
 app.get('/api/events', async (req, res) => {
   try {
@@ -161,7 +327,7 @@ app.get('/api/events/:id', async (req, res) => {
   }
 });
 
-app.post('/api/events', async (req, res) => {
+app.post('/api/events', requireAuth, async (req, res) => {
   try {
     const { title, description, date, location, capacity, imageUrl } = req.body;
     const newEvent = await Event.create({
@@ -215,7 +381,7 @@ app.post('/api/bookings', async (req, res) => {
   }
 });
 
-app.get('/api/bookings', async (req, res) => {
+app.get('/api/bookings', requireAuth, async (req, res) => {
   try {
     const bookings = await Booking.findAll({
       include: [{ model: Event, attributes: ['title'] }],
@@ -227,7 +393,7 @@ app.get('/api/bookings', async (req, res) => {
   }
 });
 
-app.get('/api/stats', async (req, res) => {
+app.get('/api/stats', requireAuth, async (req, res) => {
   try {
     const eventsCount = await Event.count();
     const bookingsCount = await Booking.count();
@@ -256,7 +422,7 @@ app.get('/api/stats', async (req, res) => {
 });
 
 // Serve frontend paths explicitly or fallback to static index/dashboard
-app.get('/dashboard', (req, res) => {
+app.get('/dashboard', requireAuthRedirect, (req, res) => {
   res.sendFile(path.join(__dirname, 'public', 'dashboard.html'));
 });
 

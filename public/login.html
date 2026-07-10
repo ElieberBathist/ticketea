@@ -1,0 +1,69 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>TicketEase | Iniciar Sesión</title>
+  <meta name="description" content="Inicia sesión en TicketEase para gestionar tus eventos y reservas de entradas en tiempo real.">
+  <link rel="stylesheet" href="css/styles.css">
+</head>
+<body>
+
+  <!-- Header / Navigation -->
+  <header class="glass">
+    <div class="nav-container">
+      <a href="/" class="logo">
+        <i data-lucide="ticket"></i>
+        <span>TicketEase</span>
+      </a>
+      <nav class="nav-links" id="nav-links">
+        <a href="/" class="nav-link">Inicio</a>
+        <a href="/login.html" class="nav-link active">Iniciar Sesión</a>
+        <a href="/register.html" class="nav-link">Registrarse</a>
+      </nav>
+    </div>
+  </header>
+
+  <!-- Login Form Section -->
+  <main style="max-width: 450px; margin: 4rem auto; padding: 0 1.5rem;">
+    <section class="dashboard-panel glass" style="padding: 2.5rem; border-radius: var(--radius-md); box-shadow: var(--shadow-lg);">
+      <h2 style="margin-bottom: 2rem; text-align: center; display: flex; align-items: center; justify-content: center; gap: 0.75rem; font-size: 1.8rem;">
+        <i data-lucide="log-in" style="color: var(--accent-primary); width: 28px; height: 28px;"></i>
+        <span>Iniciar Sesión</span>
+      </h2>
+      
+      <form id="login-form">
+        <div class="form-group" style="margin-bottom: 1.25rem;">
+          <label for="email" style="display: block; margin-bottom: 0.5rem; font-weight: 500; font-size: 0.9rem; color: var(--text-secondary);">Correo Electrónico</label>
+          <input type="email" id="email" name="email" class="form-control" placeholder="correo@ejemplo.com" required style="width: 100%;">
+        </div>
+        
+        <div class="form-group" style="margin-bottom: 1.5rem;">
+          <label for="password" style="display: block; margin-bottom: 0.5rem; font-weight: 500; font-size: 0.9rem; color: var(--text-secondary);">Contraseña</label>
+          <input type="password" id="password" name="password" class="form-control" placeholder="••••••••" required style="width: 100%;">
+        </div>
+        
+        <button type="submit" class="btn btn-primary" style="width: 100%; display: flex; align-items: center; justify-content: center; gap: 0.5rem; padding: 0.8rem; font-size: 1rem; cursor: pointer;">
+          <i data-lucide="arrow-right-circle" style="width: 18px; height: 18px;"></i>
+          <span>Ingresar</span>
+        </button>
+        
+        <p style="margin-top: 1.5rem; text-align: center; font-size: 0.9rem; color: var(--text-secondary);">
+          ¿No tienes una cuenta? <a href="/register.html" style="color: var(--accent-primary); font-weight: 600; text-decoration: underline;">Regístrate aquí</a>
+        </p>
+      </form>
+    </section>
+  </main>
+
+  <!-- Container for Toast Notifications -->
+  <div class="toast-container" id="toast-container"></div>
+
+  <!-- Lucide Icons Library -->
+  <script src="https://unpkg.com/lucide@latest"></script>
+  <script>
+    lucide.createIcons();
+  </script>
+  <script src="js/navbar.js"></script>
+  <script src="js/auth.js"></script>
+</body>
+</html>

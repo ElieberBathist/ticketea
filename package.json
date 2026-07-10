@@ -9,8 +9,10 @@
     "dev": "nodemon server.js"
   },
   "dependencies": {
+    "bcryptjs": "^3.0.3",
     "cors": "^2.8.5",
     "express": "^4.19.2",
+    "express-session": "^1.19.0",
     "sequelize": "^6.37.3",
     "sqlite3": "^5.1.7"
   },
